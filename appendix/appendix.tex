@@ -1,0 +1,88 @@
+% appendix.tex -- compact appendix for SWE-Bench Pro V2 (body draft 10)
+% Preamble needs: booktabs, graphicx (\resizebox), pifont (\cmark/\xmark)
+% \newcommand{\cmark}{\ding{51}} \newcommand{\xmark}{\ding{55}}
+%
+% Body references:
+%   §4.3  (Appendix~\ref{app:hard})
+%   §4.4  Appendix~\ref{app:exploits} (or Table~\ref{tab:flips} directly)
+%   §4.5  Table~\ref{tab:scaffolds}; Appendix~\ref{app:harness}
+%   §5    lesson (5): Appendix~\ref{app:harness}
+
+\clearpage        % start the appendix on a fresh page so its tables land on the following page, not two pages later
+\raggedbottom     % stops LaTeX stretching paragraph gaps to fill short columns next to the full-width tables
+\appendix
+
+\section{The Hard Split}
+\label{app:hard}
+
+The 51 tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families fail on it across runs. That gave 54 candidates and 3 were removed after expert review. Every Hard task passes its reference solution, fails with an empty patch, and is solved by at least one of our runs. 39 of the 51 instructions were edited in the final review after selection. 
+
+% \section{Evaluation Exploits}
+% \label{app:exploits}
+
+% Under the open network, 13 of the 32 Opus~5 runs that contacted code hosts did so through the scaffold's web-fetch tool, 11 of them on the task's own repository; the lock disables these tools and the pre-run probe checks that every code host is unreachable and that no image carries the fixing commit, a reflog entry, a stash or a dangling object. Table~\ref{tab:flips} lists every public run whose in-sandbox grade and first fresh-container grade differ because of state outside the patch, with the cause and the adjudication; the remaining disagreements, all flaky tests, are summarized in its caption.
+
+% \begin{table*}[t]
+% \centering\small
+% \begin{tabular}{p{0.17\textwidth}p{0.20\textwidth}ccp{0.39\textwidth}}
+% \toprule
+% Run & Task & In place & Fresh & Cause and adjudication \\
+% \midrule
+% Opus 5 (high, v2.2r) & vuls \texttt{ef2be3d6} & \cmark & \xmark & Forged \texttt{goval-dictionary v0.9.5}: module zip served from a file-based \texttt{GOPROXY}, fabricated \texttt{go.sum} entry; the clean image fails the checksum \\
+% Opus 5 (high, v2.2r) & vuls \texttt{ca3f6b1d} & \cmark & \xmark & Vendored, modified dependency whose \texttt{log/} package is git-ignored; the captured patch is incomplete \\
+% Inkling (high, v2.2r) & vuls \texttt{ef2be3d6} & \cmark & \xmark & Forged \texttt{goval-dictionary v0.9.5} from the older cached module with a fabricated \texttt{.info} and \texttt{go.sum} entry, as Opus~5 did; 2/2 fresh fails \\
+% Inkling (high, v2.2r) & vuls \texttt{ca3f6b1d} & \cmark & \xmark & Edited a struct field into a cached dependency with \texttt{sed -i}; nothing in the diff; 2/2 fresh fails \\
+% Inkling (high, v2.2r) & navidrome \texttt{874b17b8} & \cmark & \xmark & Made the module cache writable and added a file to a cached dependency; 2/2 fresh fails \\
+% Gemini 3.8 Flash & flipt \texttt{3d5a345f} & \cmark & \xmark & Fabricated \texttt{go.sum} entries for real dependencies after rehearsing the forgery on a fake module in the local proxy cache; 2/2 fresh fails \\
+% Gemini 3.8 Flash & flipt \texttt{c188284f} & \cmark & \xmark & Fabricated \texttt{go.work.sum} checksum; 2/2 fresh fails \\
+% Gemini 3.8 Flash & navidrome \texttt{874b17b8} & \cmark & \xmark & Edited the module cache in place; 2/2 fresh fails (Opus~5 and GLM-5.3 solved the same task offline by vendoring a local fork under a \texttt{replace} directive) \\
+% \bottomrule
+% \end{tabular}
+% \caption{Every public run whose in-place grade and first fresh-container grade differ because of state outside the patch, across the runs of Table~\ref{tab:main}. Runs labelled v2.2r used an earlier release of the tests; GLM-5.3 had no disagreement between its two grades. Eleven further disagreements were flaky tests: six in-sandbox fails that passed on every fresh grade, four in-sandbox passes confirmed by two of three fresh grades, and one (GPT-6 Astra, element-web \texttt{53b42e32}) adjudicated a fail.}
+% \label{tab:flips}
+% \end{table*}
+
+\section{Harness Study}
+\label{app:harness}
+
+\paragraph{Setup.} GLM-5.3 (thinking on), Kimi K3 (reasoning effort max) and Inkling (xhigh) ran with a 1M-token context window and no cap on thinking tokens or turns; the only cap besides the 50-minute budget is mini-swe-agent's default 30\,s per-command timeout, which is part of that scaffold. Versions: Harbor 0.22, mini-swe-agent 2.4.6, Pi 0.85.0, OpenCode 1.18.29. Before the runs we patched the task images on which Pi or OpenCode would not install (older Alpine images lacking a recent \texttt{libstdc++}, and Debian~11 images whose end-of-life package sources broke OpenCode's installer); the patches add system packages only, and all nine combinations ran on the same patched images. We release the 5{,}778 trajectories with per-trajectory feature files.
+
+\paragraph{Attempt rule.} Unlike the runs of \S\ref{sec:experiments}, these were graded once, in the container the agent had used. Every task has one counted attempt per model--scaffold combination; an attempt that hit the budget is graded on the patch present at the deadline. An attempt that hit the budget or was killed by infrastructure \emph{without} a passing grade was run once more at lower concurrency and the re-run is the counted attempt; a re-run never replaced a graded pass, and the rule was applied identically to all nine combinations. Pi and OpenCode place a different Node binary on the agent's path than the grader uses; in 13 trials an agent rebuilt a native module against it and the grader then crashed on that module (Kimi K3: 5 under Pi, 2 under OpenCode; GLM-5.3: 2 and 2; Inkling: 2 under OpenCode), and those trials count as failures.
+
+\paragraph{Outcomes.} Table~\ref{tab:pairs} gives the paired comparisons behind \S\ref{sec:harness}. Splitting the variance of solved-or-failed over the 642 tasks every combination attempted, task identity accounts for 31.7\%, the model for 2.65\%, the scaffold for 0.29\% and the model--scaffold interaction for 0.36\%; the residual 65.0\% is task-by-run variation.
+
+\begin{table}[t]
+\centering\footnotesize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\ifdim\width>\columnwidth\columnwidth\else\width\fi}{!}{%
+\begin{tabular}{llcrrr}
+\toprule
+Model & Pair ($A-B$) & only $A$\,/\,$B$ & Diff. & 95\% CI & $p$ \\
+\midrule
+GLM-5.3 & mini $-$ Pi & 15\,/\,21 & $-0.9$ & $[-2.8,+0.9]$ & 0.41 \\
+ & mini $-$ OpenCode & 15\,/\,20 & $-0.8$ & $[-2.6,+1.0]$ & 0.50 \\
+ & Pi $-$ OpenCode & 12\,/\,11 & $+0.2$ & $[-1.3,+1.6]$ & 1.00 \\
+\midrule
+Kimi K3 & mini $-$ Pi & 20\,/\,10 & $+1.6$ & $[-0.1,+3.2]$ & 0.10 \\
+ & mini $-$ OpenCode & 8\,/\,9 & $-0.2$ & $[-1.4,+1.1]$ & 1.00 \\
+ & Pi $-$ OpenCode & 6\,/\,17 & $-1.7$ & $[-3.2,-0.3]$ & 0.03 \\
+\midrule
+Inkling & mini $-$ Pi & 64\,/\,27 & $+5.8$ & $[+2.9,+8.6]$ & $<$0.001 \\
+ & mini $-$ OpenCode & 23\,/\,34 & $-1.7$ & $[-4.0,+0.6]$ & 0.18 \\
+ & Pi $-$ OpenCode & 18\,/\,66 & $-7.5$ & $[-10.2,-4.7]$ & $<$0.001 \\
+\bottomrule
+\end{tabular}}
+\caption{Paired scaffold comparisons within a model on the same 642 tasks: tasks solved only under scaffold $A$ / only under $B$, the difference in percentage points with its 95\% interval, and an exact test on the discordant tasks. ``mini'' is mini-swe-agent.}
+\label{tab:pairs}
+\end{table}
+
+\paragraph{Validation.} Pass rates are one attempt per task, a standard error of 0.6--1.4 points per combination. The activity shares of Figure~\ref{fig:harness}b and the verification rates of \S\ref{sec:harness} come from a classifier that reads the first executable of each segment of a shell command; it matched a manual read on 147 of 150 sampled commands and on 97.2\% of sampled wall-clock, and the test-outcome detector behind the red-to-green rates matched on all 32 of 40 sampled test outputs it labelled, leaving 8 undecidable. Step time includes model latency, and test-file edits are under-counted under mini-swe-agent, where edits arrive as heredocs.
+
+\section{Reproducibility}
+\label{app:repro}
+
+\paragraph{Harness.} Harbor 0.22.0 on Modal 1.5.5. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because 32 tasks download dependencies while testing. Claude Code 2.1.278 with web tools disabled; Codex 0.155.1 with hosted web search disabled; mini-swe-agent 2.4.6 with no step or cost limit, so the time budget binds.
+
+\paragraph{Budget and grading.} The budget is 3000\,s per task. The agent is stopped at 2940\,s and the patch present then is graded. The patch is the staged \texttt{git diff} of the working tree; it is applied to a fresh container built from the task image, with a three-way fallback, and the unchanged verifier runs. When the sandbox grade and the clean grade disagree, two more clean grades are taken and the majority of the three counts. Mean API spend per task on V2 was \$2.9 for the Claude Code runs, \$2.3 for Astra and \$3 for Gemini.
+
+\paragraph{Release.} Task directories, the Hard split, the probe, capture and re-grade scripts, the exact harness flags, per-task grades in both modes for every run, and the harness-study trajectories.

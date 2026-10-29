@@ -1,0 +1,26 @@
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{4pt}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{llrcr}
+\toprule
+System & Scaffold & V2 (642) & 95\% CI & Hard (51) \\
+\midrule
+%Opus 5.5 (xhigh) & Claude Code & 99.4 & [98.4, 99.8] & 96.1 \\
+Opus 5 (xhigh) & Claude Code & 99.4 & [98.4, 99.8] & 98.0 \\
+Fable 5.1 (high) & Claude Code & 99.1 & [98.6, 99.6] & 92.2 \\
+Kimi-K3 (max) & mini-swe-agent & 97.5 & [96.0, 98.5] & 88.2 \\
+GPT-6-Astra (high) & Codex & 96.9 & [95.8, 98.0] & 90.2 \\
+% GPT-6.1-Sol (xhigh) & mini-swe-agent & 96.1 & [94.9, 97.4] & -- \\
+GLM-5.3 (max) & mini-swe-agent & 95.6 & [93.8, 97.0] & 84.3 \\
+GPT-5.6-Sol (xhigh) & Codex & 95.5 & [94.1, 96.9] & 82.4 \\
+Gemini 3.8 Flash (high) & mini-swe-agent & 94.9 & [93.4, 96.3] & 58.8 \\
+Sonnet 5 (xhigh) & Claude Code & 93.2 & [91.4, 94.9] & 88.2 \\
+GPT-5.6-Terra (xhigh) & Codex & 92.4 & [90.6, 94.2] & 86.3 \\
+Inkling (xhigh) & mini-swe-agent & 89.9 & [87.8, 92.0] & 56.9 \\
+Haiku 5.5 (high) & mini-swe-agent & 87.2 & [84.9, 89.6] & 52.9 \\
+
+\bottomrule
+\end{tabular}}
+\caption{Percent of tasks resolved by each model (reasoning effort) and agent, with 95\% confidence intervals on V2, and on the Hard Split (51 instances) respectively.}
+\label{tab:main}
+\end{table}

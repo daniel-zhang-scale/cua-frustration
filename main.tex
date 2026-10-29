@@ -1,0 +1,49 @@
+\PassOptionsToPackage{hyphens}{url}
+\documentclass[11pt]{article}
+% NAACL 2027 Industry Track: official *ACL template (acl.sty / acl_natbib.bst from
+% github.com/acl-org/acl-style-files). The track is double-blind, so submit with [review].
+% Use [preprint] for a non-anonymous arXiv version and [final] for the camera-ready.
+% Limits: 6 pages of content; Limitations, Ethics, references and appendices do not count.
+\usepackage[review]{acl}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{microtype}
+\usepackage{inconsolata}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{amsmath,amssymb}
+\usepackage{graphicx}
+\usepackage{tikz}
+\usepackage{pifont}
+\usepackage{tcolorbox}
+\usepackage{pifont}
+\usepackage{tabularx}
+\newcommand{\cmark}{\ding{51}}
+\newcommand{\xmark}{\ding{55}}
+\sloppy
+\newcommand{\dyz}[1]{\textcolor{red}{[Daniel: #1]}}
+\newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
+\newcommand{\jeff}[1]{\textcolor{orange}{[Jeff: #1]}}
+\newcommand{\ivan}[1]{\textcolor{blue}{[Ivan: #1]}}
+
+
+\title{SWE-Bench Pro V2: A Cleaner, Harder-to-Game Coding Benchmark}
+\author{Soham Dan,  Jeff Da, Sanyam Bhutani, Miguel Romero Calvo, Ivan Guevara, Fernando Carabedo, Jose Bernal, Julio Reyna, Luis Leandro Monsalve Mendez, Ying Liu, Daniel Yue Zhang}
+
+\begin{document}
+\maketitle
+\input{sections/00_abstract}
+\input{sections/01_intro}
+\input{sections/02_related}
+\input{sections/03_method_v2}
+\input{sections/04_experiments}
+\input{sections/05_discussion}
+\input{sections/06_conclusion}
+%\newpage
+\input{sections/07_limitations}
+\bibliography{refs}
+\appendix
+\input{appendix/appendix}
+\end{document}

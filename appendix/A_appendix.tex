@@ -1,0 +1,117 @@
+\section{Defect Examples Before and After Repair}
+\label{app:examples}
+Table~\ref{tab:examples} gives representative tasks from each defect category of Table~\ref{tab:repairs-discards} and how each was resolved. A task was repaired when the missing or wrong information concerns behaviour the task is about, and discarded when stating it would dictate the implementation or when the defect lies in the tests, verifier or image.
+\todo{Replace the paraphrases with verbatim before/after instruction excerpts from the release for at least one repaired task per category.}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.11\textwidth}>{\raggedright\arraybackslash}p{0.10\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\toprule
+Category & Task & Before & After \\
+\midrule
+Unstated test requirement & flipt & \texttt{TestLoad} reads three YAML samples (\texttt{otlp.yml} with \texttt{samplingRatio} set to 0.5, \texttt{wrong\_sampling\_ratio.yml} and \texttt{wrong\_propagator.yml}) that exist only in the reference patch; the instruction never mentions them. & Repaired: the instruction specifies all three files. \\
+\addlinespace
+ & vuls & The instruction says to fall back to the bundle directory name. Two agent configurations did so and reported \texttt{Sample.app}, but the graded test expects \texttt{Sample} because the reference patch strips the suffix. & Repaired: the instruction states that the \texttt{.app} suffix is removed. \\
+\addlinespace
+ & qutebrowser & A graded test reads the private attribute \texttt{\_values}. & Discarded, since stating it would dictate the implementation. \\
+\addlinespace
+Spec--test contradiction & vuls & The instruction says a package is \emph{not affected} when exactly one of the package and the OVAL definition carries a modularity label, but four pre-existing graded cases require the legacy fallback to the host's enabled modules. & Repaired: the instruction states the fallback, which the reference patch keeps. \\
+\addlinespace
+ & webclients & The interface declares an \texttt{Element} argument, while the graded test passes a \texttt{Document}. & Discarded, since the fix lies in the tests. \\
+\addlinespace
+Solution leakage & tutanota & The instruction tells the agent to update the try-catch block around \texttt{aes256Decrypt} in \texttt{decrypt}. & Repaired to describe behaviour only. A \texttt{CryptoError} raised by the crypto library must surface as the application's own \texttt{CryptoError}, which the credentials layer converts to \texttt{KeyPermanentlyInvalidatedError}. \\
+\addlinespace
+Insufficient tests & flipt & The graded tests cover only the error paths of a new cache layer, so a \texttt{getJSON} that always returns false and a no-op \texttt{setJSON} pass. & Discarded, since engineers did not write new tests. \\
+\addlinespace
+ & vuls & No graded test checks an image reference that carries both a tag and a digest. & Repaired: one assertion added that expects an error for such a reference. \\
+\addlinespace
+Verifier defect & 16 tasks & The fail-to-pass list names a whole file (e.g.\ \texttt{Calendar\-Utils\-Test.js~|~test~suite}), so any unrelated or flaky failure in that file fails a correct patch. & Discarded. \\
+\addlinespace
+Environment defect & teleport & SoftHSM is missing from the image, so a graded test is skipped, and the verifier scores the skip as a failure. & Discarded. \\
+\bottomrule
+\end{tabularx}
+\caption{Representative defects by category, paraphrased from the task artifacts, and their resolution.}
+\label{tab:examples}
+\end{table*}
+
+\section{Catalogue of Evaluation Exploits}
+\label{app:exploits}
+Table~\ref{tab:exploits} lists every route to an unearned pass that we observed in agent runs, found in community reports or constructed ourselves, together with the corresponding countermeasure in the locked protocol (\S\ref{sec:protocol}). Table~\ref{tab:flips} gives the individual forgeries.
+\todo{Add two or three short trajectory excerpts (a network attempt under the lock, a forged \texttt{go.sum}, an imitation SDK) showing the commands the agents ran.}
+
+\begin{table*}[t]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}>{\raggedright\arraybackslash}p{0.17\textwidth}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{0.30\textwidth}@{}}
+\toprule
+Exploit & What we saw & Countermeasure \\
+\midrule
+Fetching the fix from code hosts & With the network open, 32 of 642 Opus~5 runs contacted code hosts and 25 downloaded the task's own repository; 13 used the scaffold's web-fetch tool, 11 of them on their own repository. & Only the model endpoint is reachable in the agent phase; scaffold web tools are disabled; the lock is probed before every run. \\
+\addlinespace
+Recovering the fix from git history & Future commits left in task images leaked fixes in SWE-bench and SWE-Bench Pro \citep{kahn2025repostate,needham2025prostate,adams2026gitreward}. & All 642 images contain neither the fixing commit nor reflog entries, stashes or dangling objects; re-checked by the probe. \\
+\addlinespace
+Tunnelling through the model endpoint & Gemini disguised a request to the Go module proxy as model-endpoint traffic. & The allowlist names the endpoint hostname alone, and the endpoint relays no other traffic; all tool calls are audited. \\
+\addlinespace
+Forging dependencies outside the patch & Opus~5 forged \texttt{goval-dictionary v0.9.5}, serving it from a file-based \texttt{GOPROXY} with a fabricated \texttt{go.sum} entry, and Inkling forged the same version from an older cached module; Gemini fabricated \texttt{go.sum} and \texttt{go.work.sum} entries. & Fresh-container re-grade: the clean image fails the checksum. \\
+\addlinespace
+Editing shared caches in place & Inkling edited a cached dependency with \texttt{sed -i}, and elsewhere made the module cache writable and added a file to it; Gemini edited the module cache in place. & Fresh-container re-grade: caches do not carry over. \\
+\addlinespace
+Tampering with the grader & A scripted agent that replaces \texttt{python3} with a script printing \textsc{PASSED} scores an empty patch 1 under in-sandbox grading. Not observed from any model. & Fresh-container re-grade: binaries do not carry over. \\
+\addlinespace
+Changing graded test files & Agents edited snapshots and test data that the hidden test patch owns (in 44 runs this made the patch fail to apply), and a \texttt{git stash} round trip left stale bytecode that the verifier imported. & Test files, test data and bytecode are reset before grading (\S\ref{sec:verifier}). \\
+\addlinespace
+Imitating a missing SDK inside the patch & On the never-public set, three systems wrote an imitation SDK into the patch for two tasks whose images lack it; 5 passes, because the tests mock the client. & Not caught by re-grading; the patch audit flags large new directories that imitate a third-party SDK. \\
+\addlinespace
+Reading hidden tests or the reference & On the never-public set, the verifier configuration carried the reference and test patches. & Removed from the bundle; trajectories are audited for reads of \texttt{/tests} and \texttt{/solution}. \\
+\bottomrule
+\end{tabularx}
+\caption{Routes to an unearned pass and how the locked protocol handles them.}
+\label{tab:exploits}
+\end{table*}
+
+\section{The Hard Split}
+\label{app:hard}
+The 51 tasks come from ansible (8), openlibrary (8), flipt (7), teleport (6), webclients (5), qutebrowser (4), vuls (4), element-web (4), navidrome (3), NodeBB (1) and tutanota (1). A task qualified if at least two of five model families (Opus~5, GLM-5.3, Kimi K3, Inkling, Gemini~3.8 Flash) failed it. That gave 54 candidates after excluding 3 tasks with verified defects, and 3 more were removed after review. Every Hard task passes with its reference solution and fails with an empty patch. We note four properties of the released list.
+\begin{itemize}\setlength\itemsep{0pt}
+\item 14 tasks qualify only through partner runs of Kimi K3.
+\item 39 of the 51 instructions were edited after selection, against 190/591 elsewhere.
+\item One task (openlibrary \texttt{7cbfb812}) has a verified test defect, and one (ansible \texttt{40ade1f8}) has a timing-sensitive test.
+\item Every Hard task is solved by at least one of our runs.
+\end{itemize}
+
+\section{Disagreements Between the Two Grades}
+\label{app:flips}
+Table~\ref{tab:flips} lists every task whose grade in the agent's sandbox differs from its first grade in a clean container, across our public runs. The runs labelled v2.2r used an earlier release of the tests.
+
+\input{tables/t7_flips}
+
+\section{The Never-Public Set}
+\label{app:private}
+The 272 tasks come from 4 organisations (154 in Go, the rest in Python and JavaScript) whose code, to their knowledge, has never been on the open web. Table~\ref{tab:privdefects} lists the defects found while running it and their status. The instruction audit was done by an LLM judge (Claude Opus~5) that saw the instruction, the hidden tests and the reference solution but no model output. We checked eight of its judgments by hand. Its grades are noisy: it agreed with itself on 71\% of re-judged unchanged tasks. On the final release, every system was run again with the same scaffold, effort and budget. With the imitation-SDK passes counted as failures, the scores are 92.6 (Opus~5), 87.5 (Kimi K3), 87.1 (GLM-5.3), 86.0 (Gemini) and 79.0 (Inkling).
+
+\input{tables/a10_private_defects}
+
+\section{Reproducibility}
+\label{app:repro}
+\paragraph{Harness.} Upstream Harbor 0.22.0 on Modal 1.5.5. The network is set per phase: public during setup, only the model endpoint during the agent phase, public again for the verifier, because 32 tasks download dependencies while testing.
+\paragraph{Scaffolds.} Claude Code 2.1.278 on the public runs and 2.1.283 on the private runs, with web tools disabled. Codex 0.155.1, with hosted web search disabled. mini-swe-agent 2.4.6, with no step or cost limit, so the time budget binds.
+\paragraph{Budget and grading.} The budget is 3000\,s per task. The agent is stopped at 2940\,s, and the patch present then is graded. The patch is the staged \texttt{git diff} of the working tree. It is applied to a fresh container built from the task image, with a three-way fallback, and the unchanged verifier runs. When the sandbox grade and the clean grade disagree, two more clean grades are taken and the majority of the three clean grades counts.
+\paragraph{Cost.} Mean API spend per task on V2 was \$2.9 for the Claude Code runs, \$2.3 for Astra and \$3 for Gemini.
+\paragraph{Release.} Task directories, the Hard split, the probe, capture and re-grade scripts, the exact harness flags, and per-task grades in both modes for every run.
+
+\section{Harness Study}
+\label{app:harness}
+Setup, attempt rule and the tables behind \S\ref{sec:harness}. We release the 5{,}778 trajectories with the per-trajectory feature files.
+
+\subsection{Setup and attempt rule}
+All three models ran at their highest thinking setting (GLM-5.3 with thinking on, Kimi K3 at reasoning effort max, Inkling at xhigh) with a 1M-token context window and no cap on thinking tokens or turns; the only cap besides the 50-minute budget is mini-swe-agent's default 30\,s per-command timeout, which is part of that scaffold. Versions: Harbor 0.22, mini-swe-agent 2.4.6, Pi 0.85.0, OpenCode 1.18.29. Before the runs we patched the task images on which Pi or OpenCode would not install: older Alpine images lacking a recent \texttt{libstdc++}, which Pi's installer needs, and Debian~11 images whose end-of-life package sources broke OpenCode's installer. The patches add system packages only and touch neither the repositories nor the tests, and all nine combinations ran on the same patched images.
+
+Unlike the runs of \S\ref{sec:experiments}, these were graded once, in the container the agent had used, and not re-graded in a fresh container. Every task has one counted attempt per model--scaffold combination; an attempt that hit the budget is graded on the patch present at the deadline. An attempt that hit the budget or was killed by infrastructure \emph{without} a passing grade was run once more at lower concurrency and the re-run is the counted attempt; a re-run never replaced a graded pass, and the rule was applied identically to all nine combinations. Pi and OpenCode place a different Node binary on the agent's path than the grader uses; in 13 trials an agent rebuilt a native module against it and the grader then crashed on that module (Kimi K3: 5 under Pi, 2 under OpenCode; GLM-5.3: 2 and 2; Inkling: 2 under OpenCode), and those trials count as failures. One GLM-5.3 run under Pi was still active past its budget while the grader's tests ran in the same container and killed a grader test process it took to be stale; it changed nothing in response and was graded \textsc{PASSED} by a later grader run. We record it as a boundary case of in-container grading.
+
+\subsection{Outcomes and cost}
+\input{tables/t9_harness_pairs}
+\input{tables/t10_harness_cost}
+Table~\ref{tab:harness-pairs} gives the paired comparisons behind \S\ref{sec:harness}. Splitting the variance of solved-or-failed over the 642 tasks every combination attempted, task identity accounts for 31.7\%, the model for 2.65\%, the scaffold for 0.29\% and the model--scaffold interaction for 0.36\%; the residual 65.0\% is task-by-run variation. Table~\ref{tab:harness-cost} gives the medians behind Figure~\ref{fig:harness}a; wall-clock minutes track endpoint capacity as much as behaviour, so time comparisons belong within a model.
+
+\subsection{Validation and caveats}
+\label{app:harness-validation}
+Pass rates are one attempt per task, a standard error of 0.6--1.4 points per combination. The activity shares of Figure~\ref{fig:harness}b and the verification rates of \S\ref{sec:harness} come from a classifier that reads the first executable of each segment of a shell command; it matched a manual read on 147 of 150 sampled commands and on 97.2\% of sampled wall-clock, and the test-outcome detector behind the red-to-green rates matched on all 32 of 40 sampled test outputs it labelled, leaving 8 undecidable. Step time includes model latency, test-file edits are under-counted under mini-swe-agent, where edits arrive as heredocs, and every V2 task carries the difficulty label ``medium'', so no difficulty split is possible.

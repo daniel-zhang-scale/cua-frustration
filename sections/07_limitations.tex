@@ -1,0 +1,9 @@
+\section*{Limitations}
+\label{sec:limitations}
+
+\paragraph{Memorization.} The public repositories and their fixes predate the evaluated models. The protocol stops retrieval at test time, not memorization during training.
+
+\paragraph{Scope of re-grading.} A clean-container re-grade rejects changes made outside the patch but forgeries inside it, such as an imitation of a missing library, are left to the patch audit. 
+
+\section*{Ethics Statement}
+The tasks come from open-source repositories under their original licences. The engineers who reviewed and repaired tasks were contracted and no personal data about them is recorded or released. We document the exploits we observed because benchmark operators need this information to defend against them, and the countermeasures are included with the benchmark.

@@ -44,6 +44,14 @@
 \newcommand{\sr}{SR\xspace}     % success rate (correctness only)
 \newcommand{\frate}{FR\xspace}  % frustration rate = 1 - TSR
 
+% The old ACL build of this project numbered lines (lineno) and wrote \@LN entries to
+% Overleaf's output.aux. A stale aux from that build would make this one fail with
+% "Undefined control sequence \@LN", so ignore those entries.
+\makeatletter
+\providecommand{\@LN}[2]{}
+\providecommand{\@LN@col}[1]{}
+\makeatother
+
 % Tables and figures scale themselves to \columnwidth; \resizebox only shrinks content
 % that is wider than the target width.
 \renewcommand{\resizebox}[3]{\adjustbox{max width=#1}{#3}}

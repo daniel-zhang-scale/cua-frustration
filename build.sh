@@ -1,5 +1,5 @@
 #!/bin/bash
-# Build + checks for the CUA Frustration Gym paper (Scale AI template). Usage: ./build.sh
+# Build + checks for the LastStraw paper (Scale AI template). Usage: ./build.sh
 # Uses pdflatex + bibtex when available (e.g. MacTeX), otherwise tectonic.
 set -e
 cd "$(dirname "$0")"

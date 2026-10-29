@@ -1,0 +1,20 @@
+% Table 3: main results. All numbers pending; model list to be confirmed.
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{6pt}
+\begin{tabular}{llrrrrr}
+\toprule
+Model & Harness & \sr (\%) & \tsr (\%) & Gap (pts) & Time ratio & Action ratio \\
+\midrule
+\tbd{Claude Fable 5.1}  & \tbd{native CU tool} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\tbd{Claude Opus 5.5}   & \tbd{native CU tool} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\tbd{Claude Sonnet 5.5} & \tbd{native CU tool} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\tbd{GPT-6-Astra}       & \tbd{native CU tool} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\tbd{Gemini 3.8}        & \tbd{native CU tool} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\tbd{Open-weight CUA}   & \tbd{shared harness} & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & \tbd{X.X$\times$} & \tbd{X.X$\times$} \\
+\midrule
+Human annotators        & --                   & \tbd{XX.X} & \tbd{XX.X} & \tbd{XX.X} & 1.0$\times$       & 1.0$\times$ \\
+\bottomrule
+\end{tabular}
+\caption{Main results on the \tbd{75} tasks, averaged over \tbd{k} runs per task. \sr counts a run as successful if the end state is correct, whatever it took; \tsr additionally requires the run to stay within the human time and action budgets. Gap is $\sr - \tsr$: the share of runs that are correct but beyond human tolerance. Time and action ratios are medians of agent over human effort on correct runs. \todo{Final model list, reasoning effort settings and 95\% CIs.}}
+\label{tab:main}
+\end{table}

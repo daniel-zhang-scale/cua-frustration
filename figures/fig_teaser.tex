@@ -1,0 +1,41 @@
+% Figure 1: the same run graded by a correctness-only benchmark and by CUA Frustration Gym.
+% The trajectory is illustrative; replace the numbers with a real run from the experiments.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[x=0.066cm, y=1cm, font=\small]
+  % time axis
+  \draw[-{Latex[length=2mm]}, scaleGray] (0,0) -- (208,0) node[right, font=\footnotesize]{time (s)};
+  \foreach \t in {0,30,60,90,120,150,180}
+    \draw[scaleGray] (\t,0) -- (\t,-0.08) node[below, font=\scriptsize]{\t};
+
+  % human row
+  \node[anchor=east, font=\small\bfseries] at (-3,1.9) {Human};
+  \fill[scaleGreen] (0,1.76) rectangle (5,2.04);
+  \node[anchor=west, font=\footnotesize] at (34,1.9)
+    {done in \tbd{5\,s} with \tbd{3} actions \textcolor{scaleForest}{\cmark}};
+
+  % agent row
+  \node[anchor=east, font=\small\bfseries] at (-3,0.9) {Agent};
+  \fill[scaleBlue!55]  (0,0.76)   rectangle (22,1.04);
+  \fill[scaleCoral!65] (22,0.76)  rectangle (118,1.04);
+  \fill[scaleAmber!65] (118,0.76) rectangle (160,1.04);
+  \fill[scaleBlue!55]  (160,0.76) rectangle (190,1.04);
+  \node[above, font=\scriptsize] at (11,1.04)  {locate};
+  \node[above, font=\scriptsize] at (72,1.04)  {loop: reopens the same menu \tbd{6}$\times$};
+  \node[above, font=\scriptsize] at (139,1.04) {detour};
+  \node[above, font=\scriptsize] at (175,1.04) {completes};
+
+  % human tolerance
+  \draw[dashed, thick, scaleCoral] (30,-0.1) -- (30,2.35)
+    node[above, font=\footnotesize]{human tolerance $\tau=\,$\tbd{30\,s}};
+  \node[anchor=west, font=\scriptsize, text=scaleCoral] at (31,0.45) {the user would take over here};
+\end{tikzpicture}
+
+\vspace{4pt}
+\begin{tabular}{@{}ll@{}}
+\textbf{Correctness-only benchmark:} & \textbf{pass}: correct end state after \tbd{190\,s} and \tbd{41} actions \\
+\textbf{\bench:} & \textbf{frustration}: the task is still unfinished when $\tau$ expires \\
+\end{tabular}
+\caption{The same agent run under two evaluation regimes (illustrative, \tbd{replace with a real trajectory}). The task takes a person \tbd{5} seconds. The agent reaches the correct state, so a pass-rate benchmark counts a success, but it spends most of the run in a loop and finishes long after the point at which annotators say they would stop the agent and do the task themselves. \bench counts this run as a failure.}
+\label{fig:teaser}
+\end{figure}

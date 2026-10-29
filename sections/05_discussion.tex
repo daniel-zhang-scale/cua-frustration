@@ -1,8 +1,8 @@
 \section{Discussion}
 \label{sec:discussion}
 
-\paragraph{Usefulness of V2 near saturation.}
-Frontier systems resolve nearly all V2 tasks, but the benchmark remains useful for four reasons. The saturation result is itself informative: on a correctly graded split the strongest systems fail fewer than 1\% of tasks, so small differences among them are not capability differences. Most deployed systems are not at the frontier: open-weight, smaller and cheaper systems span 87.2--97.7\% on the full set and 52.9--88.2\% on Hard (Table~\ref{tab:main}). This clean set supports comparisons beyond the pass rate, such as cost, time to solution and scaffold choice, which are meaningful only when every task is solvable and correctly graded. And a locked, fully solvable suite is a regression test for agent products: a failure on a task that all recent systems solve warrants investigation.
+\paragraph{Correct is not the same as useful.} \todo{What the tolerance gap means for how CUA progress is reported, and why \tsr should be reported alongside \sr.}
 
-\paragraph{Lessons for benchmark maintainers.}
-(1)~Use strong agents as auditors: the failure audit flagged 39 tasks the artifact audit missed, because some defects appear only when a capable agent writes a reasonable solution and the tests reject it. (2)~Repair instructions, keep tests fixed, and validate repairs blind: weakening a test to fit an instruction changes what the benchmark measures, and a blind re-implementation checks that the edited instruction suffices. (3)~Grade in a clean container: agents that cannot fetch a dependency sometimes forge one. (4)~Version the benchmark and release all grades, since new defects surface as agents improve. (5)~Check that common scaffolds run on every image: two of the scaffolds in \S\ref{sec:harness} failed to install on base images until we patched them.
+\paragraph{Tolerance as a training signal.} \todo{Whether time and action budgets can serve as a reward or a stopping criterion during training, and the risk that agents trade correctness for speed.}
+
+\paragraph{When to hand back control.} \todo{An agent that recognizes a loop early and hands the task back may frustrate less than one that eventually succeeds. Discuss whether a timely hand-back should earn partial credit.}

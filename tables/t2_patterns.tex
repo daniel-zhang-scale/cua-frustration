@@ -1,0 +1,21 @@
+% Table 2: taxonomy of frustration patterns and how each is detected.
+\begin{table}[t]
+\centering\small\setlength{\tabcolsep}{5pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{>{\raggedright\arraybackslash}p{2.9cm}>{\raggedright\arraybackslash}p{8.4cm}>{\raggedright\arraybackslash}p{4.6cm}}
+\toprule
+Pattern & What the user sees & Detector \\
+\midrule
+Looping & The agent repeats an action, or a short cycle of actions, without the screen changing in a way that brings it closer to the goal. & Repeated action $n$-grams on near-identical screenshots \\
+Stalling & Long pauses before trivial actions, so the screen stays still while the agent deliberates. & Inter-action gap $>\,$\tbd{X}\,s \\
+Detour & The agent reaches the goal by a much longer path than needed, e.g.\ menus and search instead of a visible control. & $A > \tbd{X}\times a^{H}$ on correct runs \\
+Primitive failure & The agent cannot perform a basic interaction such as a drag, a hover or a scroll inside a panel, and retries it. & LLM judge, human-verified \\
+Grounding miss & Clicks or types into the wrong element, sometimes repeatedly. & LLM judge, human-verified \\
+False completion & The agent reports success although the end state is wrong. & Checker fails after a ``done'' claim \\
+Unneeded hand-back & The agent stops to ask the user for confirmation or input that the task does not require, or gives up. & LLM judge, human-verified \\
+Collateral change & The agent completes the task but changes something else that the user must undo. & State diff outside the task scope \\
+\bottomrule
+\end{tabular}}
+\caption{Frustration patterns. A run can show several patterns; patterns explain why a run fails, while the pass criterion itself depends only on correctness and the tolerance budget (\S\ref{sec:metrics}). \todo{Finalize detectors and thresholds; report agreement with human labels in Appendix~\ref{app:detectors}.}}
+\label{tab:patterns}
+\end{table}

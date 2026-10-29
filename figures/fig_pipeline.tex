@@ -1,0 +1,23 @@
+% Figure 2: how tasks, human labels and agent runs become frustration verdicts.
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+    font=\footnotesize,
+    stage/.style={draw=scaleMediumGray, fill=scalePanel, rounded corners=3pt, align=center,
+                  text width=2.85cm, minimum height=1.75cm, inner sep=4pt},
+    final/.style={draw=scaleCoral, fill=scaleCoral!8, rounded corners=3pt, align=center,
+                text width=2.85cm, minimum height=1.75cm, inner sep=4pt},
+    arr/.style={-{Latex[length=2mm]}, thick, scaleGray}]
+  \node[stage] (author) {\textbf{1. Authoring}\\ \tbd{75} tasks in \tbd{8} categories, a checker per task};
+  \node[stage, right=0.3cm of author] (effort) {\textbf{2. Human effort}\\ \tbd{n} annotators do each task: time $t^{H}$, actions $a^{H}$};
+  \node[stage, right=0.3cm of effort] (tol) {\textbf{3. Human tolerance}\\ wait budget $\tau$ and action budget $\kappa$ per task};
+  \node[stage, right=0.3cm of tol] (runs) {\textbf{4. Agent runs}\\ \tbd{M} models $\times$ \tbd{k} runs, timed screen and action logs};
+  \node[final, right=0.3cm of runs] (score) {\textbf{5. Scoring}\\ \tsr, \frate, tolerance gap, pattern labels};
+  \draw[arr] (author) -- (effort);
+  \draw[arr] (effort) -- (tol);
+  \draw[arr] (tol) -- (runs);
+  \draw[arr] (runs) -- (score);
+\end{tikzpicture}
+\caption{Construction and evaluation pipeline of \bench. Human labels (stages 2--3) set a per-task budget, and a run passes only if it reaches the correct end state within that budget (\S\ref{sec:metrics}). \todo{Replace with the final pipeline figure.}}
+\label{fig:pipeline}
+\end{figure}

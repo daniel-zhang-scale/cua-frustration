@@ -1,9 +1,11 @@
 \section*{Limitations}
 \label{sec:limitations}
 
-\paragraph{Memorization.} The public repositories and their fixes predate the evaluated models. The protocol stops retrieval at test time, not memorization during training.
+\paragraph{Wall-clock time depends on infrastructure.} Agent time includes model latency, which varies with provider load, region and hardware. We fix the infrastructure across runs and also report action-based budgets, which do not depend on latency. \todo{Report the variance of $T_r$ across repeated runs.}
 
-\paragraph{Scope of re-grading.} A clean-container re-grade rejects changes made outside the patch but forgeries inside it, such as an imitation of a missing library, are left to the patch audit. 
+\paragraph{Tolerance is subjective.} Tolerance varies across people, tasks and contexts: a user watching the screen tolerates less than one who delegates a task and returns later. Our labels describe the attended setting with \tbd{n} annotators per task.
+
+\paragraph{Scale.} 75 tasks support the comparisons we make but not fine-grained claims about individual categories. \todo{Report confidence intervals per category.}
 
 \section*{Ethics Statement}
-The tasks come from open-source repositories under their original licences. The engineers who reviewed and repaired tasks were contracted and no personal data about them is recorded or released. We document the exploits we observed because benchmark operators need this information to defend against them, and the countermeasures are included with the benchmark.
+Annotators were \tbd{contracted and paid at or above local minimum wage}; no personal data about them is recorded or released. Tasks run in isolated virtual machines and locally hosted applications, and no task acts on live third-party services or real user accounts.

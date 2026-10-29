@@ -1,0 +1,65 @@
+\section{CUA Frustration Gym}
+\label{sec:benchmark}
+
+\input{figures/fig_pipeline}
+
+\bench pairs each task with two kinds of human labels: how much effort the task takes a person, and how much time and how many actions a person would give an agent before stopping it and doing the task themselves (Figure~\ref{fig:pipeline}). We describe the design principles (\S\ref{sec:principles}), the tasks (\S\ref{sec:tasks}), the human labels (\S\ref{sec:labels}), the metrics (\S\ref{sec:metrics}) and the frustration patterns (\S\ref{sec:patterns}).
+
+\subsection{Design principles}
+\label{sec:principles}
+
+\paragraph{Easy for people.} Every task is one that a person familiar with the application completes quickly and reliably from the task text alone. The median human completion time is \tbd{XX} seconds, and \tbd{XX}\% of tasks take under \tbd{XX} seconds (\S\ref{sec:labels}).
+
+\paragraph{Frustration-prone for agents.} Each task centres on an interaction that is routine for people but where agents plausibly stall, loop or take a detour, such as a drag, a hover menu, a custom widget or an interrupting dialog (Table~\ref{tab:categories}).
+
+\paragraph{Correctness is necessary but not sufficient.} Every task has a deterministic checker for the end state, as in existing benchmarks \citep{xie2024osworld,zhou2024webarena}. A correct run that exceeds the task's human budget still fails.
+
+\paragraph{The user's view of time.} Budgets are stated in wall-clock time and in actions, because a user waiting for an agent perceives both how long it takes and how much it flails. \todo{Decide whether model latency counts fully toward wall-clock time or whether we also report a latency-normalized variant; see \S\ref{sec:limitations}.}
+
+\subsection{Tasks}
+\label{sec:tasks}
+
+\input{tables/t1_categories}
+
+\paragraph{Authoring.} \tbd{N} annotators wrote the 75 tasks following written guidelines. A task must (i)~have a single unambiguous goal stated in one or two sentences, (ii)~take a person under \tbd{XX} seconds, (iii)~have an end state that a script can verify, and (iv)~avoid logins, payments, CAPTCHAs and actions on live third-party services. \todo{Describe the authoring guidelines and review rounds in Appendix~\ref{app:authoring}.}
+
+\paragraph{Categories.} We group tasks by the interaction that makes them frustration-prone (Table~\ref{tab:categories}): continuous manipulation, scrolling and hidden content, transient UI, custom widgets, text selection and editing, interruptions, keyboard and window management, and visual and spatial tasks. \todo{Check that each task maps to one primary category.}
+
+\paragraph{Environment.} Tasks run in \tbd{Ubuntu 22.04} virtual machines at a screen resolution of \tbd{1920$\times$1080}, with \tbd{Chrome, LibreOffice, a file manager and locally hosted web apps}. Each task ships with a setup script that restores a snapshot and a checker that inspects the final application or file state. \todo{Environment details, application versions, and whether we build on an existing harness such as OSWorld.}
+
+\paragraph{Selection.} \todo{State whether tasks were filtered against any model during authoring (for example, keeping only tasks on which a pilot agent struggled). If so, name the pilot model and report its results separately to avoid inflating its frustration rate.}
+
+\subsection{Human effort and tolerance labels}
+\label{sec:labels}
+
+\paragraph{Effort.} Each task was performed by \tbd{n} annotators who did not write it. We record the time from the first view of the task to completion and the number of input actions (clicks, drags, scrolls, key presses and typed strings). For task $i$, the human effort is the median completion time $t^{H}_i$ and the median action count $a^{H}_i$ across annotators. Annotators completed \tbd{XX}\% of attempts on the first try.
+
+\paragraph{Tolerance.} After completing a task, annotators answered two questions: \emph{``If you had asked an assistant to do this task while you watched the screen, how long would you wait before stopping it and doing it yourself?''} and \emph{``How many actions that do not move toward the goal would you accept before stopping it?''} The task's time tolerance $\tau_i$ and action tolerance $\kappa_i$ are the medians of these answers. Across tasks, the median $\tau_i$ is \tbd{XX} seconds, or \tbd{X.X}$\times$ the human completion time. \todo{Decide how wasted actions are counted against $\kappa_i$, or switch $\kappa_i$ to a total-action budget.}
+
+\paragraph{Validating stated tolerance.} Stated tolerance can differ from behaviour. On \tbd{XX} tasks, \tbd{n} annotators watched replays of agent runs and pressed a button at the moment they would take over. \todo{Report how behavioural take-over times compare with the stated $\tau_i$, and inter-annotator agreement on $\tau_i$.}
+
+\subsection{Metrics}
+\label{sec:metrics}
+
+For a run $r$ on task $i$, let $c_r \in \{0,1\}$ be the checker's verdict on the final state, $T_r$ the wall-clock time from the instruction to the agent's final action or completion message, and $A_r$ the number of actions it took. Runs are capped at \tbd{XX} actions or \tbd{XX} minutes, well above every task's budget, so that we can also measure correctness without a budget.
+
+\paragraph{Success rate (\sr).} The fraction of runs with $c_r = 1$, as reported by existing benchmarks.
+
+\paragraph{Tolerated success rate (\tsr).} A run succeeds only if it is correct and within both budgets:
+\begin{equation}
+s_r = c_r \cdot \mathbb{1}[T_r \le \tau_i] \cdot \mathbb{1}[A_r \le \kappa_i], \qquad \tsr = \frac{1}{|R|}\sum_{r \in R} s_r .
+\end{equation}
+The \emph{frustration rate} is $\frate = 1 - \tsr$. Every run that fails, stops early, or runs past the point at which the user would have taken over counts as a frustration.
+
+\paragraph{Tolerance gap.} $\Delta = \sr - \tsr$ is the share of runs that a correctness-only benchmark counts as successes but a user would not.
+
+\paragraph{Effort ratios.} On correct runs we report the median time ratio $T_r / t^{H}_i$ and action ratio $A_r / a^{H}_i$, which show how far agents are from human effort even when they succeed.
+
+\paragraph{Consistency.} A user who is frustrated once may stop delegating the task. Following pass$^k$ \citep{yao2025taubench}, $\tsr^{k}$ is the fraction of tasks on which all $k$ runs are tolerated successes.
+
+\subsection{Frustration patterns}
+\label{sec:patterns}
+
+\input{tables/t2_patterns}
+
+The metrics say whether a run frustrates, and the patterns in Table~\ref{tab:patterns} say how. Looping, stalling and detours are detected from the action log and screenshots with fixed rules; primitive failures, grounding misses and unneeded hand-backs are labelled by an LLM judge whose labels annotators verify on \tbd{XX} runs; false completions and collateral changes come from the checker and a state diff. \todo{Report detector precision and recall against human labels (Appendix~\ref{app:detectors}).}

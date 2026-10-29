@@ -1,49 +1,86 @@
-\PassOptionsToPackage{hyphens}{url}
-\documentclass[11pt]{article}
-% NAACL 2027 Industry Track: official *ACL template (acl.sty / acl_natbib.bst from
-% github.com/acl-org/acl-style-files). The track is double-blind, so submit with [review].
-% Use [preprint] for a non-anonymous arXiv version and [final] for the camera-ready.
-% Limits: 6 pages of content; Limitations, Ethics, references and appendices do not count.
-\usepackage[review]{acl}
-\usepackage{times}
-\usepackage{latexsym}
-\usepackage[T1]{fontenc}
-\usepackage[utf8]{inputenc}
-\usepackage{microtype}
-\usepackage{inconsolata}
+\documentclass[11pt]{scaleai-paper}
+% CUA Frustration Gym, built with the Scale AI paper class (scaleai-paper.cls).
+% Build locally with ./build.sh, or compile main.tex in Overleaf.
+
+% --- packages the class expects the manuscript to load ---
+\usepackage{amsmath,amsfonts,amssymb,amsthm}
 \usepackage{booktabs}
-\usepackage{multirow}
-\usepackage{amsmath,amssymb}
-\usepackage{graphicx}
-\usepackage{tikz}
-\usepackage{pifont}
-\usepackage{tcolorbox}
-\usepackage{pifont}
 \usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{flafter}
+\usepackage[square,numbers,sort&compress]{natbib}
+\usepackage{xspace}
+\usepackage{url}
+\usepackage[colorlinks=true,linkcolor=scaleLink,citecolor=scaleLink,urlcolor=scaleLink]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+% The template also loads todonotes; it is omitted here because it redefines \todo as a
+% margin note, which clashes with the inline \todo notes used in the sections.
+
+% --- this paper's content needs ---
+\usepackage{graphicx}
+\usepackage{adjustbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,calc,decorations.pathreplacing}
+\usepackage{pifont}
+
+% Shared macros.
 \newcommand{\cmark}{\ding{51}}
 \newcommand{\xmark}{\ding{55}}
-\sloppy
 \newcommand{\dyz}[1]{\textcolor{red}{[Daniel: #1]}}
 \newcommand{\todo}[1]{\textcolor{blue}{[TODO: #1]}}
-\newcommand{\jeff}[1]{\textcolor{orange}{[Jeff: #1]}}
-\newcommand{\ivan}[1]{\textcolor{blue}{[Ivan: #1]}}
+% \tbd{} marks a number or name that is still pending (results, counts, model names).
+% ./build.sh lists every remaining \tbd and \todo.
+\newcommand{\tbd}[1]{\textcolor{scaleCoral}{#1}}
+% \figbox{height}{description} is a grey box that stands in for a figure not yet made.
+\newcommand{\figbox}[2]{\fcolorbox{scaleMediumGray}{scalePanel}{\parbox[c][#1][c]{0.92\linewidth}{\centering\placeholder{Figure placeholder: #2}}}}
 
+% Benchmark and metric names.
+\newcommand{\bench}{CUA Frustration Gym\xspace}
+\newcommand{\tsr}{TSR\xspace}   % tolerated success rate
+\newcommand{\sr}{SR\xspace}     % success rate (correctness only)
+\newcommand{\frate}{FR\xspace}  % frustration rate = 1 - TSR
 
-\title{SWE-Bench Pro V2: A Cleaner, Harder-to-Game Coding Benchmark}
-\author{Soham Dan,  Jeff Da, Sanyam Bhutani, Miguel Romero Calvo, Ivan Guevara, Fernando Carabedo, Jose Bernal, Julio Reyna, Luis Leandro Monsalve Mendez, Ying Liu, Daniel Yue Zhang}
+% Tables and figures scale themselves to \columnwidth; \resizebox only shrinks content
+% that is wider than the target width.
+\renewcommand{\resizebox}[3]{\adjustbox{max width=#1}{#3}}
+
+% --- front matter (Scale AI template) ---
+\papertype{Scale AI Research}
+\scaleailogopath{assets/scale-logo-horizontal.png}
+% Scale logo only, no partner logo. The class's empty-partner check (\ifx against \@empty)
+% does not fire for a \newcommand-defined empty macro, so set the title logo directly.
+\makeatletter
+\renewcommand{\scaleai@titlelogos}{\includegraphics[height=0.28in]{\ScaleAILogoPath}}
+\makeatother
+\contact{\texttt{yue.zhang@scale.com}}
+
+\title{CUA Frustration Gym: Measuring When Computer-Use Agents Exhaust Human Patience}
+
+% AUTHORS: placeholder list. Add affiliation indices once confirmed, e.g. \author[1]{...}.
+\author{\tbd{Author One}, \tbd{Author Two}, \tbd{Author Three}, Daniel Yue Zhang}
+
+\affil{Scale AI}
 
 \begin{document}
 \maketitle
+
 \input{sections/00_abstract}
 \input{sections/01_intro}
 \input{sections/02_related}
-\input{sections/03_method_v2}
+\input{sections/03_benchmark}
 \input{sections/04_experiments}
 \input{sections/05_discussion}
 \input{sections/06_conclusion}
-%\newpage
 \input{sections/07_limitations}
+
+\bibliographystyle{unsrtnat}
 \bibliography{refs}
+
 \appendix
 \input{appendix/appendix}
+
 \end{document}
